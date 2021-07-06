@@ -7,15 +7,13 @@ package org.mockito.internal.configuration;
 import static org.mockito.internal.util.collections.Sets.newMockSafeHashSet;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.mockito.MockitoAnnotations;
 import org.mockito.ScopedMock;
 import org.mockito.internal.configuration.injection.scanner.InjectMocksScanner;
 import org.mockito.internal.configuration.injection.scanner.MockScanner;
+import org.mockito.internal.configuration.injection.scanner.FakeScanner;
 import org.mockito.plugins.AnnotationEngine;
 
 /**
@@ -107,16 +105,18 @@ public class InjectingAnnotationEngine
         Class<?> clazz = testClassInstance.getClass();
         Set<Field> mockDependentFields = new HashSet<>();
         Set<Object> mocks = newMockSafeHashSet();
+        List<Object> fakes = new ArrayList<>(0);
 
         while (clazz != Object.class) {
             new InjectMocksScanner(clazz).addTo(mockDependentFields);
             new MockScanner(testClassInstance, clazz).addPreparedMocks(mocks);
+            new FakeScanner(testClassInstance, clazz).addFakes(fakes);
             onInjection(testClassInstance, clazz, mockDependentFields, mocks);
             clazz = clazz.getSuperclass();
         }
 
         new DefaultInjectionEngine()
-                .injectMocksOnFields(mockDependentFields, mocks, testClassInstance);
+                .injectMocksOnFields(mockDependentFields, mocks, fakes, testClassInstance);
 
         return () -> {
             for (Object mock : mocks) {

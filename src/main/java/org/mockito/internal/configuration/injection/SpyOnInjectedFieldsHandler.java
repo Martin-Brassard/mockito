@@ -7,6 +7,8 @@ package org.mockito.internal.configuration.injection;
 import static org.mockito.Mockito.withSettings;
 
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.mockito.Mockito;
@@ -30,7 +32,7 @@ public class SpyOnInjectedFieldsHandler extends MockInjectionStrategy {
     private final MemberAccessor accessor = Plugins.getMemberAccessor();
 
     @Override
-    protected boolean processInjection(Field field, Object fieldOwner, Set<Object> mockCandidates) {
+    protected boolean processInjection(Field field, Object fieldOwner, Set<Object> mockCandidates, List<Object> fakes) {
         FieldReader fieldReader = new FieldReader(fieldOwner, field);
 
         // TODO refactor : code duplicated in SpyAnnotationEngine

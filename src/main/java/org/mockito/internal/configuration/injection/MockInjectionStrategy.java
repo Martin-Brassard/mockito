@@ -5,6 +5,8 @@
 package org.mockito.internal.configuration.injection;
 
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,7 +21,7 @@ public abstract class MockInjectionStrategy {
         return new MockInjectionStrategy() {
             @Override
             protected boolean processInjection(
-                    Field field, Object fieldOwner, Set<Object> mockCandidates) {
+                Field field, Object fieldOwner, Set<Object> mockCandidates, List<Object> fakes) {
                 return false;
             }
         };
@@ -50,7 +52,7 @@ public abstract class MockInjectionStrategy {
      * Actually inject mockCandidates on field.
      *
      * <p>
-     * Actual algorithm is defined in the implementations of {@link #processInjection(Field, Object, Set)}.
+     * Actual algorithm is defined in the implementations of {@link #processInjection(Field, Object, Set, List)}.
      * However if injection occurred successfully, the process should return <code>true</code>,
      * and <code>false</code> otherwise.
      * </p>
@@ -62,32 +64,34 @@ public abstract class MockInjectionStrategy {
      * @param onField Field needing injection.
      * @param fieldOwnedBy The owning instance of the field.
      * @param mockCandidates A set of mock candidate, that might be injected.
+     * @param fakes A list of fakes that may be injected
      * @return <code>true</code> if successful, <code>false</code> otherwise.
      */
-    public boolean process(Field onField, Object fieldOwnedBy, Set<Object> mockCandidates) {
-        if (processInjection(onField, fieldOwnedBy, mockCandidates)) {
+    public boolean process(Field onField, Object fieldOwnedBy, Set<Object> mockCandidates, List<Object> fakes) {
+        if (processInjection(onField, fieldOwnedBy, mockCandidates, fakes)) {
             return true;
         }
-        return relayProcessToNextStrategy(onField, fieldOwnedBy, mockCandidates);
+        return relayProcessToNextStrategy(onField, fieldOwnedBy, mockCandidates, fakes);
     }
 
     /**
      * Process actual injection.
      *
      * <p>
-     * Don't call this method directly, instead call {@link #process(Field, Object, Set)}
+     * Don't call this method directly, instead call {@link #process(Field, Object, Set, List)}
      * </p>
      *
      * @param field Field needing injection
      * @param fieldOwner Field owner instance.
      * @param mockCandidates Pool of mocks to inject.
+     * @param fakes a list of fakes that may be injected.
      * @return <code>true</code> if injection occurred, <code>false</code> otherwise
      */
     protected abstract boolean processInjection(
-            Field field, Object fieldOwner, Set<Object> mockCandidates);
+        Field field, Object fieldOwner, Set<Object> mockCandidates, List<Object> fakes);
 
     private boolean relayProcessToNextStrategy(
-            Field field, Object fieldOwner, Set<Object> mockCandidates) {
-        return nextStrategy != null && nextStrategy.process(field, fieldOwner, mockCandidates);
+        Field field, Object fieldOwner, Set<Object> mockCandidates, List<Object> fakes) {
+        return nextStrategy != null && nextStrategy.process(field, fieldOwner, mockCandidates, fakes);
     }
 }

@@ -5,6 +5,8 @@
 package org.mockito.internal.configuration;
 
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.mockito.internal.configuration.injection.MockInjection;
@@ -17,9 +19,10 @@ import org.mockito.internal.configuration.injection.MockInjection;
 public class DefaultInjectionEngine {
 
     public void injectMocksOnFields(
-            Set<Field> needingInjection, Set<Object> mocks, Object testClassInstance) {
+        Set<Field> needingInjection, Set<Object> mocks, List<Object> fakes, Object testClassInstance) {
         MockInjection.onFields(needingInjection, testClassInstance)
                 .withMocks(mocks)
+                .withFakes(fakes)
                 .tryConstructorInjection()
                 .tryPropertyOrFieldInjection()
                 .handleSpyAnnotation()

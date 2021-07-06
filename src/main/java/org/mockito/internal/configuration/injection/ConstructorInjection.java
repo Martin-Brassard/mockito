@@ -8,9 +8,7 @@ import static org.mockito.internal.exceptions.Reporter.fieldInitialisationThrewE
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.internal.util.reflection.FieldInitializationReport;
@@ -40,10 +38,10 @@ public class ConstructorInjection extends MockInjectionStrategy {
     public ConstructorInjection() {}
 
     @Override
-    public boolean processInjection(Field field, Object fieldOwner, Set<Object> mockCandidates) {
+    public boolean processInjection(Field field, Object fieldOwner, Set<Object> mockCandidates, List<Object> fakes) {
         try {
             SimpleArgumentResolver simpleArgumentResolver =
-                    new SimpleArgumentResolver(mockCandidates);
+                    new SimpleArgumentResolver(mockCandidates, fakes);
             FieldInitializationReport report =
                     new FieldInitializer(fieldOwner, field, simpleArgumentResolver).initialize();
 
@@ -63,16 +61,26 @@ public class ConstructorInjection extends MockInjectionStrategy {
      */
     static class SimpleArgumentResolver implements ConstructorArgumentResolver {
         final Set<Object> objects;
+        final List<Object> fakes;
 
         public SimpleArgumentResolver(Set<Object> objects) {
+            this(objects, Collections.emptyList());
+        }
+
+        public SimpleArgumentResolver(Set<Object> objects, List<Object> fakes) {
             this.objects = objects;
+            this.fakes = fakes;
         }
 
         @Override
         public Object[] resolveTypeInstances(Class<?>... argTypes) {
             List<Object> argumentInstances = new ArrayList<>(argTypes.length);
-            for (Class<?> argType : argTypes) {
-                argumentInstances.add(objectThatIsAssignableFrom(argType));
+            for (int i=0;i<argTypes.length;i++) {
+                if (i < fakes.size() && fakes.get(i) != null) {
+                    argumentInstances.add(fakes.get(i));
+                } else {
+                    argumentInstances.add(objectThatIsAssignableFrom(argTypes[i]));
+                }
             }
             return argumentInstances.toArray();
         }

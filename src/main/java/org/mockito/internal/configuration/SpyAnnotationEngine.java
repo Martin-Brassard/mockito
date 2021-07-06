@@ -15,12 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockSettings;
-import org.mockito.Mockito;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.internal.configuration.plugins.Plugins;
 import org.mockito.internal.util.MockUtil;
@@ -56,7 +51,7 @@ public class SpyAnnotationEngine
         for (Field field : fields) {
             if (field.isAnnotationPresent(Spy.class)
                     && !field.isAnnotationPresent(InjectMocks.class)) {
-                assertNoIncompatibleAnnotations(Spy.class, field, Mock.class, Captor.class);
+                assertNoIncompatibleAnnotations(Spy.class, field, Fake.class, Mock.class, Captor.class);
                 Object instance;
                 try {
                     instance = accessor.get(field, testInstance);

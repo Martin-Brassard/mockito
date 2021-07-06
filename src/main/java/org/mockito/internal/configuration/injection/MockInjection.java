@@ -9,9 +9,7 @@ import static org.mockito.internal.util.Checks.checkNotNull;
 import static org.mockito.internal.util.collections.Sets.newMockSafeHashSet;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Internal injection configuration utility.
@@ -53,6 +51,7 @@ public final class MockInjection {
         private final Object fieldOwner;
         private final MockInjectionStrategy injectionStrategies = MockInjectionStrategy.nop();
         private final MockInjectionStrategy postInjectionStrategies = MockInjectionStrategy.nop();
+        private final List<Object> fakes = new ArrayList<>();
 
         private OngoingMockInjection(Field field, Object fieldOwner) {
             this(Collections.singleton(field), fieldOwner);
@@ -85,9 +84,14 @@ public final class MockInjection {
 
         public void apply() {
             for (Field field : fields) {
-                injectionStrategies.process(field, fieldOwner, mocks);
-                postInjectionStrategies.process(field, fieldOwner, mocks);
+                injectionStrategies.process(field, fieldOwner, mocks, fakes);
+                postInjectionStrategies.process(field, fieldOwner, mocks, fakes);
             }
+        }
+
+        public OngoingMockInjection withFakes(List<Object> fakes) {
+            this.fakes.addAll(checkNotNull(fakes, "fakes"));
+            return this;
         }
     }
 

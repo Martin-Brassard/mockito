@@ -12,10 +12,7 @@ import static org.mockito.internal.util.reflection.SuperTypesLastSorter.sortSupe
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.internal.configuration.injection.filter.MockCandidateFilter;
@@ -77,7 +74,7 @@ public class PropertyAndSetterInjection extends MockInjectionStrategy {
 
     @Override
     public boolean processInjection(
-            Field injectMocksField, Object injectMocksFieldOwner, Set<Object> mockCandidates) {
+            Field injectMocksField, Object injectMocksFieldOwner, Set<Object> mockCandidates, List<Object> fakes) {
         FieldInitializationReport report =
                 initializeInjectMocksField(injectMocksField, injectMocksFieldOwner);
 

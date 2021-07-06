@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Observer;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class ConstructorInjectionTest {
 
     @Test
     public void should_do_the_trick_of_instantiating() throws Exception {
-        boolean result = underTest.process(field("whatever"), this, newSetOf(observer));
+        boolean result = underTest.process(field("whatever"), this, newSetOf(observer), Collections.emptyList());
 
         assertTrue(result);
         assertNotNull(whatever);
